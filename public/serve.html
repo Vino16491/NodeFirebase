@@ -34,26 +34,27 @@
                     <div class="panel-body">
                         <!-- Register Form -->
                         <div class="container col-sm-12">
-                            <form action="">
+                            <form id="registerForm">
                                 <div class="form-group">
                                     <label for="mobileNumber">Mobile Number:</label>
                                     <input type="tel" class="form-control" id="mobileNumber" placeholder="Enter Mobile Number..."
                                         name="mobileNumber" minlength="10" maxlength="10" required>
                                 </div>
-                                <button type="button" class="btn btn-default">Generate OTP</button>
+                                <button type="button" class="btn btn-default" onclick="generateOtp(mobileNumber.value)">Generate
+                                    OTP</button>
                                 <div class="form-group">
                                     <label for="otp">One Time Password:</label>
                                     <input type="password" class="form-control" id="otp" placeholder="One Time Password"
                                         name="otppwd" minlength="6" maxlength="6">
                                 </div>
-                                <button type="button" class="btn btn-primary">Submit OTP</button>
+                                <button type="button" class="btn btn-primary" onclick="otpSubmit(otp.value)">Submit OTP</button>
                                 <div class="form-group">
                                     <label for="pwd">Password:</label>
                                     <input type="password" class="form-control" id="pwd" placeholder="Enter password"
                                         name="pwd">
                                 </div>
 
-                                <button type="submit" class="btn btn-success">Submit</button>
+                                <button type="button" value="submit" class="btn btn-success" onclick="registerSubmit()">Submit</button>
                             </form>
                         </div>
                     </div>
