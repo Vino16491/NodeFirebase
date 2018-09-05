@@ -6,10 +6,12 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [
-      {
+    "rewrites": [{
         "source": "/timestamp",
-        "function":"apphost",
+        "function": "apphost"
+      },
+      {
+        "source": "**",
         "destination": "/index.html"
       }
     ]
