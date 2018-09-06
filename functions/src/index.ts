@@ -43,8 +43,19 @@ app.get("/timestamp", (request, response) => {
 });
 
 app.post("/register", (req, res) => {
-  res.status(201).json({
-    message: "User Created"
-  });
+  const dbUser = db.collection("users").doc()
+    dbUser.set({
+      mobileNumber: "9819254711",
+      password: "vink",
+      id:dbUser.id
+    },{merge:true})
+    .then(ref => {
+      console.log(ref);
+      res.status(201).json({
+        message: "User Created",
+        user:dbUser.id
+      });
+    })
+    .catch(e => res.status(500).json({ e: e }));
 });
 exports.apphost = functions.https.onRequest(app);
