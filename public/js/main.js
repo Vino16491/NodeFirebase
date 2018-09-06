@@ -1,5 +1,9 @@
+const config = require('./firebase.config');
+const fireDb = require('firebase/database');
+firebase.initializeApp(config);
+
 function registerSubmit() {
-    console.log(JSON.stringify(document.getElementById(registerForm).value))
+fireDb.database.create
 }
 
 function generateOtp(mobilenumber) {

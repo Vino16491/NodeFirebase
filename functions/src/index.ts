@@ -5,8 +5,11 @@ import admin = require("firebase-admin");
 const serviceAccount = require("../../ServiceAccountKey.json");
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://crud-acl.firebaseio.com"
 });
+
+const db = admin.firestore();
 
 const uid = "some-uid";
 const additionalClaims = {
@@ -37,5 +40,11 @@ const additionalClaims = {
 const app = express();
 app.get("/timestamp", (request, response) => {
   response.send(`${Date.now()}` + " Hello World");
+});
+
+app.post("/register", (req, res) => {
+  res.status(201).json({
+    message: "User Created"
+  });
 });
 exports.apphost = functions.https.onRequest(app);
