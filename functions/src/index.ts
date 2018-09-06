@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import express = require("express");
-import bodyParser = require('body-parser');
+import bodyParser = require("body-parser");
 import admin = require("firebase-admin");
 const serviceAccount = require("../../ServiceAccountKey.json");
 
@@ -39,13 +39,21 @@ const additionalClaims = {
 
 const app = express();
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended:false
-}));
-app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PATCH, DELETE, OPTIONS');
+app.use(
+  bodyParser.urlencoded({
+    extended: false
+  })
+);
+app.use(function(req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "POST, GET, PATCH, DELETE, OPTIONS"
+  );
   next();
 });
 app.get("/timestamp", (request, response) => {
@@ -53,19 +61,31 @@ app.get("/timestamp", (request, response) => {
 });
 
 app.post("/register", (req, res) => {
-  const dbUser = db.collection("users").doc()
-    dbUser.set({
-      mobileNumber: req.body.mobileNumber,
-      password: req.body.password,
-      id:dbUser.id
-    },{merge:true})
+  const dbUser = db.collection("users").doc();
+  dbUser
+    .set(
+      {
+        mobileNumber: req.body.mobileNumber,
+        password: req.body.password,
+        id: dbUser.id
+      },
+      { merge: true }
+    )
     .then(ref => {
       console.log(ref);
-
-      res.status(201).json({
-        message: "User Created",
-        user:dbUser.id
-      });
+      admin
+        .auth()
+        .createCustomToken(dbUser.id, additionalClaims)
+        .then(customToken => {
+          // console.log(customToken);
+          res.status(201).json({
+            message: "User Created",
+            user: customToken
+          });
+        })
+        .catch(err => {
+          console.log("Error Creating custom token:" + err);
+        });
     })
     .catch(e => res.status(500).json({ e: e }));
 });
