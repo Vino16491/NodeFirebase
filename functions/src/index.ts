@@ -1,4 +1,5 @@
 import * as functions from "firebase-functions";
+import bcrypt = require("bcryptjs");
 import express = require("express");
 import bodyParser = require("body-parser");
 import admin = require("firebase-admin");
@@ -60,13 +61,14 @@ app.get("/timestamp", (request, response) => {
   response.send(`${Date.now()}` + " Hello World");
 });
 
+/** Register API */
 app.post("/register", (req, res) => {
   const dbUser = db.collection("users").doc();
   dbUser
     .set(
       {
         mobileNumber: req.body.mobileNumber,
-        password: req.body.password,
+        password: bcrypt.hashSync(req.body.password, 10),
         id: dbUser.id
       },
       { merge: true }
@@ -78,7 +80,7 @@ app.post("/register", (req, res) => {
         .createCustomToken(dbUser.id, additionalClaims)
         .then(customToken => {
           // console.log(customToken);
-          res.status(201).json({
+          return res.status(201).json({
             message: "User Created",
             user: customToken
           });
@@ -89,4 +91,32 @@ app.post("/register", (req, res) => {
     })
     .catch(e => res.status(500).json({ e: e }));
 });
+
+/* login token generate */
+app.post("/login", (req, res) => {
+  let dbUser = db
+    .collection("users")
+    .where("mobileNumber", "==", req.body.mobileNumber)
+    .limit(1);
+  dbUser
+    .get()
+    .then(doc =>
+      doc.forEach(doc => {
+        if (!bcrypt.compareSync(req.body.password, doc.data().password)) {
+          return res.status(401).json({ e: "userid or password is incorrect" });
+        }
+        return admin
+          .auth()
+          .createCustomToken(doc.data().id, additionalClaims)
+          .then(token => {
+            return res.status(201).json({
+              message: "User login",
+              user: token
+            });
+          });
+      })
+    )
+    .catch(e => res.status(500).json({ err: e }));
+});
+
 exports.apphost = functions.https.onRequest(app);
