@@ -8,7 +8,7 @@ import bodyParser = require("body-parser");
 /** Firebase admin module for user creation and custom token generation */
 import admin = require("firebase-admin");
 /** Service Account Key need to be private  */
-const serviceAccount = require("../../ServiceAccountKey.json");
+const serviceAccount = require("./ServiceAccountKey.json");
 
 /** Initializing admin with Firebase credential  */
 admin.initializeApp({
@@ -86,14 +86,14 @@ app.post("/register", (req, res) => {
 /** login API will taked user id and password and will verify database 
  * on success will generate @param token and sent it to user*/
 app.post("/login", (req, res) => {
-  let dbUser = db
+  const dbUser = db
     .collection("users")
     .where("mobileNumber", "==", req.body.mobileNumber)
     .limit(1);
   dbUser
     .get()
-    .then(doc =>
-      doc.forEach(doc => {
+    .then(docSnap =>
+      docSnap.forEach(doc => {
         if (!bcrypt.compareSync(req.body.password, doc.data().password)) {
           return res.status(401).json({ e: "userid or password is incorrect" });
         }
