@@ -1,10 +1,16 @@
 import * as functions from "firebase-functions";
+/** module for password encryption and decryption */
 import bcrypt = require("bcryptjs");
+/** module for creating apis  */
 import express = require("express");
+/** module for parsing data from documents  */
 import bodyParser = require("body-parser");
+/** Firebase admin module for user creation and custom token generation */
 import admin = require("firebase-admin");
+/** Service Account Key need to be private  */
 const serviceAccount = require("../../ServiceAccountKey.json");
 
+/** Initializing admin with Firebase credential  */
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://crud-acl.firebaseio.com"
@@ -12,31 +18,11 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-const uid = "some-uid";
+/** @constant additionalClaims used for creating rules  */
 const additionalClaims = {
   premiumnAccount: true
 };
 
-// admin
-//   .auth()
-//   .createCustomToken(uid, additionalClaims)
-//   .then(customToken => {
-//     console.log(customToken);
-//   })
-//   .catch(err => {
-//     console.log("Error Creating custom token:" + err);
-//   });
-// admin
-//   .auth()
-//   .createUser({
-//     phoneNumber: "+919819254711",
-//     password: "vino@123456",
-//     disabled: false
-//   })
-//   .then(userRecord => {
-//     console.log("successfully created: ", JSON.stringify(userRecord));
-//   })
-//   .catch(err => console.log("id creation error : " + JSON.stringify(err)));
 
 const app = express();
 app.use(bodyParser.json());
@@ -58,11 +44,15 @@ app.use(function(req, res, next) {
   next();
 });
 app.get("/timestamp", (request, response) => {
-  response.send(`${Date.now()}` + " Hello World");
+  response.send(`${Date.now()}` +'\n' +`<h1> API is Working </h1>`);
 });
 
-/** Register API */
+/** Register API @constant dbUser is used for creating doc id before setting its values
+ * @var password is encrypted using bcrypt and salted for 10 rounds
+ * @param customToken is send to the user on successful registration for login
+ */
 app.post("/register", (req, res) => {
+  
   const dbUser = db.collection("users").doc();
   dbUser
     .set(
@@ -92,7 +82,9 @@ app.post("/register", (req, res) => {
     .catch(e => res.status(500).json({ e: e }));
 });
 
-/* login token generate */
+
+/** login API will taked user id and password and will verify database 
+ * on success will generate @param token and sent it to user*/
 app.post("/login", (req, res) => {
   let dbUser = db
     .collection("users")
