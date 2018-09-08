@@ -64,7 +64,7 @@ app.post("/register", (req, res) => {
       { merge: true }
     )
     .then(ref => {
-      console.log(ref);
+      // console.log(ref);
       admin
         .auth()
         .createCustomToken(dbUser.id, additionalClaims)
