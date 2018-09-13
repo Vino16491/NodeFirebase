@@ -140,32 +140,6 @@ app.post("/passreset", (req, res) => {
     })
     .catch(e => console.log(e));
 
-  // console.log(JSON.stringify(query));
-  // // let docid;
-  // // query
-  // //   .get()
-  // //   .then(docSnap => {
-  // //     return docSnap.forEach(udoc => {
-  // //       if (udoc.exists) {
-  // //         return (docid = udoc.id);
-  // //       }
-  // //       return res
-  // //         .status(401)
-  // //         .json({ message: "user id or password is incorrect" });
-  // //     });
-  // //   })
-  // //   .then();
-
-  // // if (docid) {
-  // //   dbUser
-  // //     .doc(String(docid))
-  // //     .update({
-  // //       password: req.body.password
-  // //     })
-  // //     .then(() => {
-  // //       return res.status(200).json({ message: "reset success" });
-  // //     });
-  // // }
 });
 
 exports.apphost = functions.https.onRequest(app);
