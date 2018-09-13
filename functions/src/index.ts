@@ -129,7 +129,7 @@ app.post("/passreset", (req, res) => {
         return dbUser
           .doc(id.id)
           .update({
-            password: req.body.password
+            password: bcrypt.hashSync(req.body.password, 10)
           })
           .then(() => {
             return res
