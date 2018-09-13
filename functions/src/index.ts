@@ -23,6 +23,8 @@ const additionalClaims = {
   premiumnAccount: true
 };
 
+const settings = { timestampsInSnapshots: true };
+db.settings(settings);
 
 const app = express();
 app.use(bodyParser.json());
@@ -44,7 +46,7 @@ app.use(function(req, res, next) {
   next();
 });
 app.get("/timestamp", (request, response) => {
-  response.send(`${Date.now()}` +'\n' +`<h1> API is Working </h1>`);
+  response.send(`${Date.now()}` + "\n" + `<h1> API is Working </h1>`);
 });
 
 /** Register API @constant dbUser is used for creating doc id before setting its values
@@ -52,7 +54,6 @@ app.get("/timestamp", (request, response) => {
  * @param customToken is send to the user on successful registration for login
  */
 app.post("/register", (req, res) => {
-  
   const dbUser = db.collection("users").doc();
   dbUser
     .set(
@@ -82,8 +83,7 @@ app.post("/register", (req, res) => {
     .catch(e => res.status(500).json({ e: e }));
 });
 
-
-/** login API will taked user id and password and will verify database 
+/** login API will taked user id and password and will verify database
  * on success will generate @param token and sent it to user*/
 app.post("/login", (req, res) => {
   const dbUser = db
@@ -109,6 +109,63 @@ app.post("/login", (req, res) => {
       })
     )
     .catch(e => res.status(500).json({ err: e }));
+});
+
+/** password reset  */
+app.post("/passreset", (req, res) => {
+  const dbUser = db.collection("users");
+  const query = dbUser
+    .where("mobileNumber", "==", req.body.mobileNumber)
+    .limit(1);
+
+  return query
+    .get()
+    .then(uId => {
+      if (!uId.size) {
+        return res.status(401).json({ message: "user not found" });
+      }
+
+      return uId.forEach(id => {
+        return dbUser
+          .doc(id.id)
+          .update({
+            password: req.body.password
+          })
+          .then(() => {
+            return res
+              .status(200)
+              .json({ message: "password updated successfully" });
+          });
+      });
+    })
+    .catch(e => console.log(e));
+
+  // console.log(JSON.stringify(query));
+  // // let docid;
+  // // query
+  // //   .get()
+  // //   .then(docSnap => {
+  // //     return docSnap.forEach(udoc => {
+  // //       if (udoc.exists) {
+  // //         return (docid = udoc.id);
+  // //       }
+  // //       return res
+  // //         .status(401)
+  // //         .json({ message: "user id or password is incorrect" });
+  // //     });
+  // //   })
+  // //   .then();
+
+  // // if (docid) {
+  // //   dbUser
+  // //     .doc(String(docid))
+  // //     .update({
+  // //       password: req.body.password
+  // //     })
+  // //     .then(() => {
+  // //       return res.status(200).json({ message: "reset success" });
+  // //     });
+  // // }
 });
 
 exports.apphost = functions.https.onRequest(app);
