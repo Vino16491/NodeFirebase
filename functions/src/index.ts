@@ -139,7 +139,23 @@ app.post("/passreset", (req, res) => {
       });
     })
     .catch(e => console.log(e));
+});
 
+/* Change user Mobile Number Request */
+app.post("/mchangereq", (req, res) => {
+  // if (req.body.uid) {
+  return admin
+    .auth()
+    .updateUser(req.body.uid, {
+      phoneNumber: req.body.phoneNumber,
+      emailVerified:Boolean(req.body.emailVerified)
+
+    })
+    .then((s) => {
+
+      res.status(201).json({ message: "mobile number status", data:{...s} });
+    }).catch(e => res.status(400).json({ err: e }));
+  // }
 });
 
 exports.apphost = functions.https.onRequest(app);
