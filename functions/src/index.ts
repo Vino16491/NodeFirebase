@@ -147,14 +147,13 @@ app.post("/mchangereq", (req, res) => {
   return admin
     .auth()
     .updateUser(req.body.uid, {
-      phoneNumber: req.body.phoneNumber,
-      emailVerified:Boolean(req.body.emailVerified)
-
+      phoneNumber: req.body.phoneNumber
+      // emailVerified:Boolean(req.body.emailVerified)
     })
-    .then((s) => {
-
-      res.status(201).json({ message: "mobile number status", data:{...s} });
-    }).catch(e => res.status(400).json({ err: e }));
+    .then(s => {
+      res.status(201).json({ message: "mobile number status", data: { ...s } });
+    })
+    .catch(e => res.status(400).json({ err: e }));
   // }
 });
 
